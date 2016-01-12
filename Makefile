@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -O3 -g3
+CFLAGS=-std=c99 -O3 -g3 -D_POSIX_SOURCE
 PREFIX?=/usr/local/
 
 all:trim

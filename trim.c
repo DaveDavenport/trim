@@ -19,6 +19,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -29,11 +30,29 @@ int main ( int argc, char **argv )
     int c;
     int count = 0;
     int single =0;
+    int tabsize = 4;
 
-    for ( int ac = 1 ; ac < argc; argv++) {
+    for ( int ac = 1 ; ac < argc; ac++) {
         if( strcmp (argv[ac], "-s") == 0 ){
             single = 1;
         }
+        else if (strcmp(argv[ac], "-t") == 0 && (ac+1) < argc) {
+            ac++;
+            tabsize = strtoul(argv[ac], NULL, 10);
+        }
+        else if ( strcmp ( argv[ac], "-h") == 0){
+            printf("%s usage:\n", argv[0]);
+            printf("\t%s [options]\n\n", argv[0]);
+            printf("Read from stdin, strip leading and trailing whitespace and print to stdout.\n\n");
+            printf("Options:\n");
+            printf("\t-s: If multiple whitespace detected in the middle of the string, only print one space.");
+            return EXIT_SUCCESS;
+        }
+    }
+
+    if( isatty(fileno(stdin))){
+        fprintf(stderr, "Trim needs to take it input from a pipe or redirect, not a tty.\n");
+        return EXIT_FAILURE;
     }
     while (( c = getchar()) != EOF)
     {
@@ -45,12 +64,12 @@ int main ( int argc, char **argv )
             continue;
         }
         // If we encounter blanks, count them for now.
-        // Only do spaces..  we need something for tabs.
         if ( c == ' ' ) {
             count++;
         }
+        // For tabs we count 4 atm.
         else if ( c == '\t' ){
-            count+=4;
+            count+=tabsize;
         }
         else{
             if(count){
