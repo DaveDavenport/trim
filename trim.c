@@ -25,6 +25,8 @@
 
 int main ( int argc, char **argv )
 {
+    int max_width = -1;
+    int cur_width = 0;
     int start = 1;
     int c;
     int count   = 0;
@@ -38,6 +40,10 @@ int main ( int argc, char **argv )
         else if ( strcmp ( argv[ac], "-t" ) == 0 && ( ac + 1 ) < argc ) {
             ac++;
             tabsize = strtoul ( argv[ac], NULL, 10 );
+        }
+        else if ( strcmp ( argv[ac], "-w" ) == 0 && ( ac + 1 ) < argc ) {
+            max_width = strtoll ( argv[ac + 1], NULL, 0 );
+            ac++;
         }
         else {
             printf ( "%s usage:\n", argv[0] );
@@ -65,6 +71,13 @@ int main ( int argc, char **argv )
             continue;
         }
         // If we encounter blanks, count them for now.
+        if   (  c == '\n' ) {
+            cur_width = 0;
+            start     = 1;
+            count     = 0;
+            putchar ( c );
+            fflush ( stdout );
+        }
         if ( c == ' ' ) {
             count++;
         }
@@ -81,7 +94,10 @@ int main ( int argc, char **argv )
                     }
                 }
             }
-            putchar ( c );
+            cur_width++;
+            if ( !( max_width > 0 && cur_width >= max_width ) ) {
+                putchar ( c );
+            }
         }
     }
     return EXIT_SUCCESS;
